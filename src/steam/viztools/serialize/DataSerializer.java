@@ -16,15 +16,23 @@ import steam.viztools.model.User;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
 
+/**
+ * Data serialization support. Uses Google Gson to store gamer data,
+ * then retrieve it for offline processing.
+ * 
+ * NOTE: user data retrieval is currently unsupported, due to some tweaks
+ * to the core domain model. 
+ */
 public class DataSerializer {
 
-  Gson gson = new Gson();
-  JsonParser parser = new JsonParser();
+  private Gson gson = new Gson();
 
+  /**
+   * Write the given set of User objects to the given output stream, in JSON format
+   */
   public void writeUsers(Set<User> users, OutputStream os) {
 
     Gson gson = new GsonBuilder().setPrettyPrinting().create();
@@ -36,11 +44,33 @@ public class DataSerializer {
       os.write(jbytes);
     } catch (IOException e) {
       throw new RuntimeException(
-          "IO exception detected while writing json data", e);
+          "IO exception detected while writing user json data", e);
     }
 
   }
 
+  /**
+   * Write the given set of Game objects to the given output stream, in JSON format
+   */
+  public void writeGames(Set<Game> games, OutputStream os) {
+
+    Gson gson = new GsonBuilder().setPrettyPrinting().create();
+
+    String json = gson.toJson(games);
+    byte[] jbytes = json.getBytes();
+
+    try {
+      os.write(jbytes);
+    } catch (IOException e) {
+      throw new RuntimeException(
+          "IO exception detected while writing game json data", e);
+    }
+
+  }
+  
+  /**
+   * Reads a list of User objects from the given input stream.
+   */
   public Set<User> readUsers(InputStream is) throws IOException {
 
     JsonReader jr = new JsonReader(new InputStreamReader(is));
@@ -101,9 +131,9 @@ public class DataSerializer {
     }
     
     // Construct the actual in-memory User representation from the various pieces    
-    User user = new User(steamID);
+    User user = new User(steamID, null);
     for (Game g : games) {
-      user.addGame(g, achievements.get(g.appID));
+      user.addGame(g, null, null);
     }
     
     return user;

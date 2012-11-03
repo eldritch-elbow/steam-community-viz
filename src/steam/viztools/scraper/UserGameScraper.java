@@ -3,14 +3,10 @@ package steam.viztools.scraper;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -21,38 +17,30 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-import steam.viztools.model.Game;
 
-
-// The underlying HTTP connection is still held by the response object 
-// to allow the response content to be streamed directly from the network socket. 
-// In order to ensure correct deallocation of system resources 
-// the user MUST either fully consume the response content  or abort request 
-// execution by calling HttpGet#releaseConnection().
-
-
-
+/**
+ * A scraper for user game data
+ */
 public class UserGameScraper {
 
 	private HttpClient httpclient;
 	
-	private List<Game> games;
+	private List<String> games;
 	
 	public UserGameScraper() {
 		httpclient = new DefaultHttpClient();
 	}
 
-	/*
-	 * Build a list of game information for a user
+	/**
+	 * Build a list of game achievement information for a user
 	 */
 	public void scrape(String id) throws ClientProtocolException, IOException, ParserConfigurationException, IllegalStateException, SAXException {
 		
 		System.out.println("Scraping games for user "+id);
-		games = new ArrayList<Game>();
+		games = new ArrayList<String>();
 		
 		// Query games
 		HttpGet httpGet = new HttpGet(
@@ -98,19 +86,12 @@ public class UserGameScraper {
 		
 		NodeList gameData = gameEl.getChildNodes();
 		
-		Map<String,String> gameEls = new HashMap<String,String>(  );
-		gameEls.put("appID", null);
-		gameEls.put("name", null);
-
-	    XMLWrappers.getElementText(gameData, gameEls);
-	    
-		games.add(new Game(
-				gameEls.get("appID"), 
-				gameEls.get("name")));
+		Map<String,String> gameEls = XMLWrappers.getElementText(gameData, "appID");	    
+		games.add(gameEls.get("appID"));
 	}
 
-
-	public List<Game> getGames() {
+	/** Accessor for the most recently retrieved games */
+	public List<String> getGames() {
 		return Collections.unmodifiableList(games);
 	}
 

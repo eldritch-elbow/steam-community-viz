@@ -1,25 +1,65 @@
 package steam.viztools.model;
 
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
+
+/**
+ * Represents a steam game.
+ */
 public class Game {
 
+  /** The 'app ID' - a unique identifier for the game within steam */
 	public final String appID;
-	public final String name;
-
-	public Game(String appID, String name) {
+	
+	private String name;
+	private Set<Achievement> achievements;
+	
+	/**
+	 * App ID based constructor. Other details can be set later;
+	 * this constructor allows game creation based on user game lists.
+	 */
+	public Game(String appID) {
 		super();
 		this.appID = appID;
-		this.name = name;
+		this.name = null;
+		this.achievements = new HashSet<Achievement>();
 	}
 
-	@Override
-	public String toString() {
-	  /* Default GSON serialization uses toString to serialize map keys ... */
-		return appID;
-	}
-
-
-	/* Overridden object behaviour - AUTO GENERATED, DO NOT MODIFY DIRECTLY */
+	/*
+	 * Getters and setters - game objects may be created when
+	 * first encountered for users, then filled in later
+	 */
 	
+	/** Set the name of the game */
+	public void setName(String name) {
+	  this.name = name;
+	}
+
+	/** Add an achievement to the game */
+	public void addAchievement(Achievement ach) {	  
+	  achievements.add(ach);
+	}
+	
+	/** The name of the game */
+  public String name() {
+    return name;
+  }
+
+  /** Returns an unmodifiable view of the achievements associated with the game */
+  public Set<Achievement> achievements() {
+    return Collections.unmodifiableSet( achievements );
+  }
+
+  @Override
+  public String toString() {
+    // toString just displays app ID, to help GSON persistence...
+    return appID;
+  }
+	
+
+	/* AUTO GENERATED. DO NOT MODIFY */
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -44,5 +84,5 @@ public class Game {
 			return false;
 		return true;
 	}
-	
+
 }

@@ -3,6 +3,7 @@ package steam.viztools.scraper;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
+import java.util.HashMap;
 import java.util.Map;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -22,6 +23,9 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
+/**
+ * A few static helper methods for processing XML
+ */
 public class XMLWrappers {
 
 	private static Transformer transformer;
@@ -42,7 +46,6 @@ public class XMLWrappers {
 		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 		DocumentBuilder db = dbf.newDocumentBuilder();
 		Document document = db.parse(contentStream);
-		//XMLWrappers.printDocument(document);
 		
 		return document;
 	}
@@ -62,8 +65,13 @@ public class XMLWrappers {
 	}
 	
 
-	public static void getElementText(NodeList nodes, Map<String, String> expectedEls) {
+	public static Map<String,String> getElementText(NodeList nodes, String... expectedEls) {
 		
+    Map<String,String> textEls = new HashMap<String,String>(  );
+    for (String expected : expectedEls) {
+      textEls.put(expected, null);
+    }
+	  
 		for(int i=0; i<nodes.getLength(); i++){
 	    	
 			Node node= nodes.item(i);
@@ -74,9 +82,11 @@ public class XMLWrappers {
 			Element element = (Element)node;
 	    	String elName = element.getTagName();
 	    	
-	    	if ( expectedEls.containsKey(elName) ) {
-	    		expectedEls.put(elName, element.getTextContent());
+	    	if ( textEls.containsKey(elName) ) {
+	    		textEls.put(elName, element.getTextContent());
 	    	}
 		}
+		
+		return textEls;
 	}
 }

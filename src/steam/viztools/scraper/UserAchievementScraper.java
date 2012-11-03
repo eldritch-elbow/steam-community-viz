@@ -3,12 +3,10 @@ package steam.viztools.scraper;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import javax.xml.parsers.ParserConfigurationException;
-
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -25,23 +23,29 @@ import org.xml.sax.SAXException;
 import steam.viztools.Constants;
 import steam.viztools.model.Achievement;
 
+/**
+ * A scraper for user achievements
+ */
 public class UserAchievementScraper {
 
 	private HttpClient httpclient;
 	
-	private List<Achievement> achievements;
+	private List<Achievement> achieved;
+  private List<Achievement> notAchieved;
 	
 	public UserAchievementScraper() {
 		httpclient = new DefaultHttpClient();
 	}
 	
-	/*
+	/**
 	 * Build a list of game information for a user
 	 */
 	public void scrape(String id, String game) throws ClientProtocolException, IOException, ParserConfigurationException, IllegalStateException, SAXException {
 		
 		System.out.println("Scraping achievements for "+id+"/"+game);
-		achievements = new ArrayList<Achievement>();
+		
+		achieved = new ArrayList<Achievement>();
+		notAchieved = new ArrayList<Achievement>();
 		
 		String uri = String.format(
 				"http://api.steampowered.com/ISteamUserStats/GetPlayerAchievements/v0001/" +
@@ -89,21 +93,29 @@ public class UserAchievementScraper {
 	
 		NodeList achData = gameEl.getChildNodes();
 		
-		Map<String,String> textEls = new HashMap<String,String>(  );
-		textEls.put("apiname", null);
-		textEls.put("achieved", null);
+		Map<String,String> textEls = XMLWrappers.getElementText(achData, "apiname", "achieved");		
+		String readName = textEls.get("apiname");
 		
-		XMLWrappers.getElementText(achData, textEls);
+		Achievement ach = Achievement.fromString(readName);		
+		if (ach == null) {
+		  System.out.println(" Discarding: "+readName);
+		}
 		
-		achievements.add(new Achievement(
-				textEls.get("apiname"), 
-				textEls.get("achieved").equals("1")));
+		if (textEls.get("achieved").equals("1")) {		
+  		achieved.add(ach);		
+		} else {
+      notAchieved.add(ach);   
+		}
 	}
 	
-	public List<Achievement> getAchievements() {
-		return Collections.unmodifiableList(achievements);
+	/** Accessor most recently retrieved achievements held for a user */
+	public List<Achievement> getAchieved() {
+		return Collections.unmodifiableList(achieved);
 	}
 	
-	
+  /** Accessor most recently retrieved achievements NOT held for a user */
+  public List<Achievement> getNotAchieved() {
+    return Collections.unmodifiableList(notAchieved);
+  }
 	
 }
