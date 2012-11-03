@@ -1,10 +1,16 @@
 package steam.viztools;
 
 
+/**
+ * Various constants related to retrieving and vizualizing gamer data
+ */
 public class Constants {
 
 	public static String FILE_SEP = System.getProperty("file.separator");
-
-	public static String API_KEY="1DFEE0F6034695D0833027EAC609F84F";
+	public static String API_KEY = System.getProperty("steam.viztools.apikey");
+	
+  static {
+    System.out.println("Using steam API key: " + API_KEY);
+  }
 	
 }
