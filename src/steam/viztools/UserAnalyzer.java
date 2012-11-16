@@ -19,7 +19,7 @@ import com.tinkerpop.blueprints.util.io.gml.GMLWriter;
 /**
  * Command line program for analyzing previously retrieved gamer data
  */
-public class SteamAnalyzer {
+public class UserAnalyzer {
 
 	/**
 	 * Main method. Requires arguments:

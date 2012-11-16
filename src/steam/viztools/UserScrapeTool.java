@@ -28,7 +28,7 @@ import com.google.common.collect.Sets;
  * Command line program for retrieving gamer data from the Steam
  * Community API
  */
-public class SteamScraper {
+public class UserScrapeTool {
 
 	/**
 	 * Main method. Requires arguments:
@@ -77,9 +77,6 @@ public class SteamScraper {
 	}
 
 
-
-	
-	
 	
   private static void scrapeUsers(String inFile, Set<User> users,
       Map<String, Game> games) throws Exception {
@@ -93,8 +90,6 @@ public class SteamScraper {
 		}
   }
 
-
-
   private static void scrapeGames(Map<String, Game> games) throws Exception {
     
     GameScraper gs = new GameScraper();  
@@ -105,6 +100,7 @@ public class SteamScraper {
     }
   }
 
+  
   private static void validate(Set<User> users, Collection<Game> games) {
 
     System.out.println("**** Checking for extra user achievements ****");
@@ -194,7 +190,7 @@ public class SteamScraper {
      * Display users and games
      */
     
-    Map<Game,Integer> top = SteamAnalyzer.deriveTopGames(users);
+    Map<Game,Integer> top = UserAnalyzer.deriveTopGames(users);
     
     ValueComparator bvc =  new ValueComparator(top);
     TreeMap<Game,Integer > sorted_map = new TreeMap<Game,Integer>(bvc);

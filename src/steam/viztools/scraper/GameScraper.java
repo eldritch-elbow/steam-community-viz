@@ -42,33 +42,25 @@ public class GameScraper {
 
     String uri = String.format(
         "http://api.steampowered.com/ISteamUserStats/GetGlobalAchievementPercentagesForApp/v0002/"+
-        "?gameid=%s&format=xml", 
+        "?" +
+        "gameid=%s&" +
+        "format=xml", 
            g.appID);
 
     // Query achievements
     HttpGet httpGet = new HttpGet(uri);
-
     HttpResponse response1 = httpclient.execute(httpGet);
+    
     System.out.println("Response: " + response1.getStatusLine());
 
     try {
+      
       // Get response, parse it, consume entire stream
       HttpEntity entity1 = response1.getEntity();
       Document document = XMLWrappers.parseDocument(entity1.getContent());
+      
       EntityUtils.consume(entity1);
-
-      // Get list of all achievements
-      NodeList nl = document.getElementsByTagName("achievement");
-      System.out.println("Found " + nl.getLength() + " achievements");
-
-      // Process achievements
-      for (int i = 0; i < nl.getLength(); i++) {
-
-        Element achElement = (Element) nl.item(i);
-        scrapeGlobalAchievementElement(achElement, g);
-      }
-
-      EntityUtils.consume(entity1);
+      parseAchievements(g, document);
 
     } finally {
       httpGet.releaseConnection();
@@ -76,18 +68,34 @@ public class GameScraper {
 
   }
 
-  private void scrapeGlobalAchievementElement(Element achElement, Game g) {
+  private void parseAchievements(Game g, Document document) {
+    
+    // Get list of all achievements
+    NodeList nl = document.getElementsByTagName("achievement");    
+    System.out.println("Found " + nl.getLength() + " achievements");
+
+    // Process achievements
+    for (int i = 0; i < nl.getLength(); i++) {
+      Element achElement = (Element) nl.item(i);
+      parseGlobalAchievementElement(achElement, g);
+    }
+  }
+
+  private void parseGlobalAchievementElement(Element achElement, Game g) {
 
     NodeList achData = achElement.getChildNodes();
 
-    Map<String, String> textEls = XMLWrappers.getElementText(achData, "name");
+    Map<String, String> textEls = XMLWrappers.getElementText(achData, "name", "percent");
     String readName = textEls.get("name");
+    String globRate = textEls.get("percent");
     
     Achievement ach = Achievement.fromString(readName);
     if (ach == null) {
       System.out.println(" Discarding: "+readName);
       return;
     }
+    
+    ach.setRate(Float.valueOf(globRate));
     
     g.addAchievement(ach);
   }

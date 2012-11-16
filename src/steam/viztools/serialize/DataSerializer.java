@@ -16,6 +16,9 @@ import steam.viztools.model.User;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
 
@@ -77,6 +80,22 @@ public class DataSerializer {
     return readUserArray(jr);
   }
 
+  public Set<Game> readGameSet(InputStream is) throws IOException {
+    
+    JsonReader jr = new JsonReader( new InputStreamReader(is) );    
+    JsonParser parser = new JsonParser();    
+    JsonArray array = parser.parse(jr).getAsJsonArray();
+    
+    Set<Game> games = new HashSet<Game>();
+    
+    for (JsonElement jsel : array) {
+      Game g = gson.fromJson(jsel, Game.class);
+      games.add(g);
+    }
+    
+    return games;
+  }
+  
   /*
    * Private JSON parsing methods
    */

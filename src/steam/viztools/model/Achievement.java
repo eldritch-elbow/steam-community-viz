@@ -1,12 +1,15 @@
 package steam.viztools.model;
 
 /**
- * Immutable class representing an achievement in a game.
+ * Class representing an achievement in a game.
  */
 public class Achievement {
 
   /** Achievement ID */
 	public final String id;
+	
+	/** Global rate (additional non-identifying data) */
+	private Float globalRate;
 
 	/**
 	 * Factory method for immutable class
@@ -39,12 +42,23 @@ public class Achievement {
 		this.id = id;
 	}
 
+	/* Getters/setters for additional non identifying data */
+	
+  public void setRate(Float grate) {
+    globalRate = grate;
+  }
+
+  public Float globalRate() {
+    return globalRate;
+  }
+
+	
   @Override
   public String toString() {
     return id;
   }
   
-
+  
   /*
    * Auto-generated methods - DO NOT MODIFY MANUALLY
    */
