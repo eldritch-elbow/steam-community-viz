@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.util.Set;
 
+import steam.viztools.model.Achievement;
 import steam.viztools.model.Game;
 import steam.viztools.serialize.DataSerializer;
 
@@ -27,8 +28,19 @@ public class GameAnalyzer {
 		Set<Game> games = ds.readGameSet(fis);
 		
 		/* Generate some useful data here - template code */
+    System.out.println("Game\tAchievement\tRate");  
 		for (Game g : games) {
-		  System.out.println(g.appID);
+		  
+		  for (Achievement a : g.achievements()) {
+		    
+		    if (a.globalRate() < 0 || a.globalRate() > 100) {
+		      continue;
+		    }
+		    
+		    System.out.println(String.format("%s\t|%s|\t%.2f",g.appID, a.id, a.globalRate()));  
+		  }
+		  
+		  
 		}
 		
 		
