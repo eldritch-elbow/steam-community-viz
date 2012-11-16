@@ -5,7 +5,7 @@ This repository contains a project for retrieving, storing, and visualizing data
 the Steam Community API. It's self contained, so all you should need to do is clone it,
 then import the <code>steam-viz</code> folder into an Eclipse workspace.
 
-To run the scraper, execute the main method in the SteamScraper class. This requires two arguments: 
+To run the scraper, execute the main method in the UserScrapeTool class. This requires two arguments: 
 
 (1) an input file containing steam IDs to retreive data for, and 
 (2) a prefix for an output file.
@@ -13,6 +13,8 @@ To run the scraper, execute the main method in the SteamScraper class. This requ
 You'll also need to provide a system property <code>steam.viztools.apikey</code> containing a valid
 Steam Community API key. 
    
+Results are written into the 'data' folder.
+
 *Notes:*
 
  * Currently, only Steam data retrieval is supported, via the SteamScraper class. 
