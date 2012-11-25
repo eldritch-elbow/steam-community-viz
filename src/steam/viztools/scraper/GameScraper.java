@@ -1,6 +1,7 @@
 package steam.viztools.scraper;
 
 import java.io.IOException;
+import java.text.DecimalFormat;
 import java.util.Map;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -38,7 +39,7 @@ public class GameScraper {
   public void scrape(Game g) throws ClientProtocolException, IOException,
       IllegalStateException, ParserConfigurationException, SAXException {
 
-    System.out.println("Scraping global achievement data for game " + g.appID);
+    System.out.println( String.format("SCRAPING: %s %s ", g.appID, g.name() ) );
 
     String uri = String.format(
         "http://api.steampowered.com/ISteamUserStats/GetGlobalAchievementPercentagesForApp/v0002/"+
@@ -57,9 +58,9 @@ public class GameScraper {
       
       // Get response, parse it, consume entire stream
       HttpEntity entity1 = response1.getEntity();
-      Document document = XMLWrappers.parseDocument(entity1.getContent());
-      
+      Document document = XMLWrappers.parseDocument(entity1.getContent());      
       EntityUtils.consume(entity1);
+      
       parseAchievements(g, document);
 
     } finally {
@@ -72,7 +73,7 @@ public class GameScraper {
     
     // Get list of all achievements
     NodeList nl = document.getElementsByTagName("achievement");    
-    System.out.println("Found " + nl.getLength() + " achievements");
+    System.out.println( String.format("Game %s: %d achievement nodes", g.appID, nl.getLength() ) ); 
 
     // Process achievements
     for (int i = 0; i < nl.getLength(); i++) {
@@ -95,7 +96,7 @@ public class GameScraper {
       return;
     }
     
-    ach.setRate(Float.valueOf(globRate));
+    ach.setRate( Float.valueOf(globRate) );
     
     g.addAchievement(ach);
   }

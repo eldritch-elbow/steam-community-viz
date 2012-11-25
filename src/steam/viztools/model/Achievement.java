@@ -25,13 +25,12 @@ public class Achievement {
 	  if (candidateID.length() == 0) {
       return null;
     }
-	  
 	  if (candidateID.equals("null")) {
 	    return null;
 	  }
 	  
     if (candidateID.contains("test")) {
-      return null;
+      System.out.println(candidateID);
     }
 	  
 	  return new Achievement(candidateID);

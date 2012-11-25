@@ -70,7 +70,23 @@ public class DataSerializer {
     }
 
   }
-  
+
+  public void writeGame(Game game, OutputStream os) {
+
+    Gson gson = new GsonBuilder().setPrettyPrinting().create();
+
+    String json = gson.toJson(game);
+    byte[] jbytes = json.getBytes();
+
+    try {
+      os.write(jbytes);
+    } catch (IOException e) {
+      throw new RuntimeException(
+          "IO exception detected while writing game json data", e);
+    }
+
+  }
+
   /**
    * Reads a list of User objects from the given input stream.
    */

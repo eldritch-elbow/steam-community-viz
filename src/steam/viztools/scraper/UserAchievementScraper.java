@@ -66,18 +66,7 @@ public class UserAchievementScraper {
 		    Document document = XMLWrappers.parseDocument(entity1.getContent());
 		    EntityUtils.consume(entity1);
 		    	
-		    // Get achievements
-		    NodeList nl = document.getElementsByTagName("achievement");		    
-		    System.out.println("Found "+nl.getLength() + " achievements");
-    
-		    // Process achievements
-		    for(int i=0; i<nl.getLength(); i++){
-		    	
-		      Element achElement = (Element)nl.item(i);		      
-		      scrapeAchievementElement(achElement);		      
-		    }
-		    
-		    EntityUtils.consume(entity1);
+		    parseAchievements(document);
 		    
 		} finally {
 		    httpGet.releaseConnection();
@@ -85,11 +74,25 @@ public class UserAchievementScraper {
 		
 	}
 
+  private void parseAchievements(Document document) {
+    
+    // Get achievements
+    NodeList nl = document.getElementsByTagName("achievement");		    
+    System.out.println("Found "+nl.getLength() + " achievements");
+  
+    // Process achievements
+    for(int i=0; i<nl.getLength(); i++){
+    	
+      Element achElement = (Element)nl.item(i);		      
+      parseAchievementElement(achElement);		      
+    }
+  }
+
 
 	/*
 	* Extract achievement information from an XML element for a user's game
 	*/
-	private void scrapeAchievementElement(Element gameEl) {
+	private void parseAchievementElement(Element gameEl) {
 	
 		NodeList achData = gameEl.getChildNodes();
 		

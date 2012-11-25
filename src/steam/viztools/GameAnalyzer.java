@@ -29,10 +29,11 @@ public class GameAnalyzer {
 		
 		/* Generate some useful data here - template code */
     System.out.println("Game\tAchievement\tRate");  
+    int count = 0;
 		for (Game g : games) {
 		  
 		  for (Achievement a : g.achievements()) {
-		    
+		    count++;
 		    if (a.globalRate() < 0 || a.globalRate() > 100) {
 		      continue;
 		    }
@@ -40,8 +41,8 @@ public class GameAnalyzer {
 		    System.out.println(String.format("%s\t|%s|\t%.2f",g.appID, a.id, a.globalRate()));  
 		  }
 		  
-		  
 		}
+    System.out.println("Processed "+count+" achievements");
 		
 		
 	}

@@ -1,5 +1,6 @@
 library(psych)
 
+
 # Assign data from to achievements object
 achs <- read.table("achievements.txt", header=T)
 
@@ -11,11 +12,13 @@ describe(achs)
 
 
 
-# Assign data from to counts object
-achrates <- read.table("achievement-rates.txt", header=T, quote="\")
+
+# Assign data from achievement rates file
+achrates <- read.table("ach-rates-full.txt", header=T, quote="|")
 
 # Plot histogram for data
 hist(achrates$Rate)
+hist(achrates$Rate, breaks = 100)
 
 # Get some descriptive stats
-#describe(achrates)
+describe(achrates)
