@@ -1,7 +1,6 @@
 package steam.viztools.scraper;
 
 import java.io.IOException;
-import java.text.DecimalFormat;
 import java.util.Map;
 
 import javax.xml.parsers.ParserConfigurationException;
