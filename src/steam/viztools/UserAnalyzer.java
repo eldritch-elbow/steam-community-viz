@@ -53,7 +53,7 @@ public class UserAnalyzer {
 		  }
 		}
 		
-    System.out.println("User\tAchievement\tRate");  
+    System.out.println("User\tGame\tAchievement\tRate");  
 
 		for (User u : users) {
 		  
@@ -71,7 +71,7 @@ public class UserAnalyzer {
 		        throw new RuntimeException("No global record found for user achievement!");
 		      }
 		      
-		      System.out.println(String.format("~%s~\t~%s~\t%.2f", u.name, a.id, globAch.globalRate()));
+		      System.out.println(String.format("~%s~\t~%s~\t~%s~\t%.2f", u.name, ug.appID, a.id, globAch.globalRate()));
 		      
 		    }
 		    

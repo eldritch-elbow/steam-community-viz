@@ -27,7 +27,10 @@ describe(achrates)
 
 # ACHIEVEMENT RATES FOR USER
 
-achrates <- read.table("user-achievement-rates.txt", header=T, quote="~")
+achrates <- read.table("user-ach-rates.txt", header=T, quote="~")
 ar.hum <- subset(achrates, User == "Humiliator")
+ar.jw <- subset(achrates, User == "jediwannabe")
+ar.dav <- subset(achrates, User == "David")
+
 hist(ar.hum$Rate)
 hist(ar.hum)
