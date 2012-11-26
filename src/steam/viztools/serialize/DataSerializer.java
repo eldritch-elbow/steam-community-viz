@@ -133,8 +133,10 @@ public class DataSerializer {
   private User readUser(JsonReader jr) throws IOException {
 
     String steamID = null;
+    String userName = null;
     Set<Game> games = null;
-    Map<String, Set<Achievement>> achievements = null;
+    Map<String, Set<Achievement>> achieved = null;
+    Map<String, Set<Achievement>> notAchieved = null;
     
     jr.beginObject();
 
@@ -147,28 +149,44 @@ public class DataSerializer {
         steamID = jr.nextString();      
         System.out.println( String.format("Steam ID: %s", steamID) );
         
+      } if (name.equals("name")) {
+          
+        userName = jr.nextString();      
+        System.out.println( String.format("Name: %s", userName) );
+          
       } else if (name.equals("games")) {
   
         games = readGameSet(jr);
         System.out.println( String.format("Games: %s", games) );
   
-      } else if (name.equals("achievements")) {
+      } else if (name.equals("achieved")) {
   
-        achievements = readUserAchievements(jr);
+        System.out.println("Achieved list:");
+        achieved = readUserAchievements(jr);
+        
+      } else if (name.equals("notAchieved")) {
+        
+        System.out.println("Not achieved list:");
+        notAchieved = readUserAchievements(jr);
       }
       
     }
     
     jr.endObject();
     
-    if (steamID == null || games == null || achievements == null) {
+    if (steamID == null || userName == null || games == null || achieved == null || notAchieved == null) {
       throw new RuntimeException( String.format( "Invalid data detected for user: %s", steamID ));
     }
     
     // Construct the actual in-memory User representation from the various pieces    
-    User user = new User(steamID, null);
+    User user = new User(steamID, userName);
     for (Game g : games) {
-      user.addGame(g, null, null);
+      Set<Achievement> ached = achieved.get(g.appID);
+      Set<Achievement> notYet = notAchieved.get(g.appID);
+      if (ached == null || notYet == null) {
+        throw new RuntimeException( String.format( "Invalid achievements detected for user: %s", steamID ));
+      }
+      user.addGame(g, ached, notYet);
     }
     
     return user;

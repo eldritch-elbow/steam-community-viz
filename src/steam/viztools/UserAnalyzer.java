@@ -2,19 +2,14 @@ package steam.viztools;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import steam.viztools.model.Achievement;
 import steam.viztools.model.Game;
 import steam.viztools.model.User;
 import steam.viztools.serialize.DataSerializer;
-
-import com.tinkerpop.blueprints.Graph;
-import com.tinkerpop.blueprints.Vertex;
-import com.tinkerpop.blueprints.impls.tg.TinkerGraph;
-import com.tinkerpop.blueprints.util.io.gml.GMLWriter;
 
 /**
  * Command line program for analyzing previously retrieved gamer data
@@ -33,25 +28,66 @@ public class UserAnalyzer {
 	  /*
 	   *  Define filenames, create file objects
 	   */
-	  String inFilename = args[0];
-	  String outFilename1 = String.format("data%s%s.gml", Constants.FILE_SEP, args[1] );
+	  String inUserFilename = args[0];
+    String inGameFilename = args[1];
 	  
-		File infile = new File(inFilename);
-		File outFileGraph = new File(outFilename1);
 		
 		/*
-		 *  Read user data, derive further data
+		 *  Read data, derive further data
 		 */
-		FileInputStream fis = new FileInputStream(infile);
-		
+		FileInputStream fisU = new FileInputStream( new File(inUserFilename) );		
+    FileInputStream fisG = new FileInputStream( new File(inGameFilename) );   
 		DataSerializer ds = new DataSerializer();
-		Set<User> users = ds.readUsers(fis);
-
+		
+		Set<User> users = ds.readUsers(fisU);
+    Set<Game> games = ds.readGameSet(fisG);
 		Map<Game, Integer> gameData = deriveTopGames(users);
 		
+		/*
+		 * Analyze / dump out interesting user data into R format 
+		 */
+		Map<String, Achievement> globalAchMap = new HashMap<String, Achievement>();
+		for (Game g : games) {
+		  for (Achievement a : g.achievements()) {	      
+		    globalAchMap.put( String.format("%s:%s", g.appID, a.id) , a);		    
+		  }
+		}
+		
+    System.out.println("User\tAchievement\tRate");  
+
+		for (User u : users) {
+		  
+		  for (Game ug : u.games()) {
+		    
+		    for (Achievement a : u.achieved(ug)) {
+
+		      if (a == null) { // Exact reason for this stray data TBD
+		        continue;
+		      }		      
+		      
+		      Achievement globAch = globalAchMap.get( String.format("%s:%s", ug.appID, a.id) );
+		      
+		      if (globAch == null) {
+		        throw new RuntimeException("No global record found for user achievement!");
+		      }
+		      
+		      System.out.println(String.format("~%s~\t~%s~\t%.2f", u.name, a.id, globAch.globalRate()));
+		      
+		    }
+		    
+		  }
+		  
+		}
+		
+		
     /*
-     * Create a graph from the game data
+     * EXAMPLE: create a graph from the game data
      */
+    /*
+    String outFilename1 = String.format("data%s%s.gml", Constants.FILE_SEP, args[1] );
+    File outFileGraph = new File(outFilename1);
+
+ 
     Graph graph = new TinkerGraph();
     for (Game g : gameData.keySet()) {
       
@@ -59,14 +95,13 @@ public class UserAnalyzer {
       
       Vertex gameVert = graph.addVertex(null);
       gameVert.setProperty("appID", g.appID);
-      gameVert.setProperty("name", g.name());
       gameVert.setProperty("count", count);
 
     }
 
     FileOutputStream out = new FileOutputStream(outFileGraph);
     GMLWriter.outputGraph(graph, out);
-		
+		*/
 	}
 
   public static Map<Game, Integer> deriveTopGames(Set<User> users) {
